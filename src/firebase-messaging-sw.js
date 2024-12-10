@@ -12,3 +12,39 @@
 // });
 
 // co0qI51nCxQdyka2qkPT2I:APA91bFhgLnaK2YDycBe4yT7iw_PqcQseya4imWJVMXHpC9WJpaBD7ryw3pSAlR6eoALsxsp1VjrKBm_1dy7YDbOm6wgFp9WZL1H5TCoFmKTzSQWfTl-sGc
+self.addEventListener('push', function (event) {
+    if (event.data) {
+      const payload = event.data.json();
+      const notification = payload.notification || {};
+      console.log("notification : ", notification);
+      
+      const notificationTitle = notification.title || 'Default Title';
+      const notificationOptions = {
+        body: notification.body || 'Default Body',
+        icon: notification.icon || 'assets/test.jpg',
+        // link: notification.data.link || 'http://127.0.0.1:8080',
+      };
+  
+      event.waitUntil(
+        self.registration.showNotification(notificationTitle, notificationOptions)
+      );
+    }
+  });
+  
+  self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
+    console.log("event : ", event);
+    
+    const url = 'http://127.0.0.1:8080';
+    event.waitUntil(
+      clients.matchAll({type : 'window'}).then(function(clientlist) {
+        const client = clientlist.find(client => client.url.includes(url));
+        if (client){
+            client.focus();
+            client.navigate(url);
+        }else{
+            clients.openWindow(url);
+        }
+      })
+    );
+  });

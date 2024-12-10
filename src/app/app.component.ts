@@ -52,7 +52,17 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.fcmService.reuquestPermission();
-    this.fcmService.listenMessages();
+    Notification.requestPermission().then(
+      (notiPermission: NotificationPermission) => {
+        if (notiPermission === "granted") {
+          console.log("Granted");
+          this.fcmService.reuquestPermission();
+          this.fcmService.listenMessages();
+        }
+        if (notiPermission === "denied") {
+          console.log("Denied");
+        }
+      }
+    )
   }
 }
